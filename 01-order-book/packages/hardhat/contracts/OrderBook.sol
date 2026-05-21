@@ -5,8 +5,9 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract OrderBook {
+    // ---------------------------- STATE VARIABLES ----------------------------
     using SafeERC20 for IERC20;
-
+    // ---------------------------- CUSTOM ERRORS ----------------------------
     // Custom errors for invalid inputs and conditions.
     // Using named errors is more gas-efficient than string messages.
     error InvalidAmount();
@@ -27,7 +28,7 @@ contract OrderBook {
     uint256 public nextOrderId;
     mapping(uint256 => Order) public orders;
 
-    // Events
+    // ---------------------------- EVENTS ----------------------------
     event OrderPlaced(
         uint256 indexed orderId,
         address indexed trader,
@@ -46,7 +47,7 @@ contract OrderBook {
         uint256 price
     );
     event OrderCanceled(uint256 indexed orderId, address indexed trader);
-
+    // ---------------------------- CONSTRUCTOR ----------------------------
     // Constructor saves the addresses of the two tokens that are going to be traded
     constructor(address _tokenA, address _tokenB) {
         // require makes sure that neither address is a zero address (this would be invalid)
@@ -55,7 +56,7 @@ contract OrderBook {
         baseToken = IERC20(_tokenA);
         quoteToken = IERC20(_tokenB);
     }
-
+    // ---------------------------- ORDER CREATION ----------------------------
     // Allow a user to create a buy order for baseToken using quoteToken as payment.
     // The user must specify:
     //      - amount = how many baseToken they want to buy (in baseToken units)
@@ -108,7 +109,7 @@ contract OrderBook {
         // Emit an event so off-chain apps know a sell order was created
         emit OrderPlaced(orderId, msg.sender, 1, address(baseToken), address(quoteToken), amount, price);
     }
-
+    // ---------------------------- ORDER MATCHING ----------------------------
     // Match an existing buy order with an existing sell order.
     // Anyone can call this and it does not have to be the order creators.
     // The two orders must have compatible prices (buy price >= sell price).
@@ -154,7 +155,7 @@ contract OrderBook {
         // Emit an event to record the match
         emit OrderMatched(buyOrderId, sellOrderId, buyOrder.trader, sellOrder.trader, matchAmount, sellOrder.price);
     }
-
+    // ---------------------------- ORDER CANCELLATION ----------------------------
     // Allow the creator of an order to cancel the order and get their tokens back.
     // Only unfilled or partially filled orders can be cancelled.
     // The contract returns the tokens that were locked when the order was placed.
@@ -187,6 +188,7 @@ contract OrderBook {
         emit OrderCanceled(orderId, msg.sender);
     }
 
+    // ---------------------------- QUERY FUNCTIONS ----------------------------
     // Returns how many baseToken are still remaining in an order.
     // If the order was completely matched or cancelled, the result will be 0.
     function remaining(uint256 orderId) external view returns (uint256) {
