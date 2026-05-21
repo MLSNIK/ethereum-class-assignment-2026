@@ -14,7 +14,7 @@ import { Actions } from "@uniswap/v4-periphery/src/libraries/Actions.sol";
 import { IPositionManager } from "@uniswap/v4-periphery/src/interfaces/IPositionManager.sol";
 
 contract RewardTokensManager is Ownable {
-    // ---------------------------- State variables ----------------------------
+    // ---------------------------- STATE VARIABLES ----------------------------
     // Attach the PoolId library to PoolKey so poolKey.toId() can be called
     using PoolIdLibrary for PoolKey;
 
@@ -45,7 +45,7 @@ contract RewardTokensManager is Ownable {
     // so the same pool cannot be initialised twice.
     mapping(bytes32 => bool) public createdPools;
 
-    // ---------------------------- Events ----------------------------
+    // ---------------------------- EVENTS ----------------------------
     // Emitted when a pool is successfully created
     event PoolCreated(
         bytes32 indexed poolId,
@@ -67,11 +67,11 @@ contract RewardTokensManager is Ownable {
         uint256 liquidity
     );
 
-    // ---------------------------- Custom errors ----------------------------
+    // ---------------------------- CUSTOM ERRORS ----------------------------
     // Reverted if the mint tick range does not include the required price
     error TickRangeDoesNotCoverAssignmentPrice();
 
-    // ---------------------------- Constructor ----------------------------
+    // ---------------------------- CONSTRUCTOR ----------------------------
     // Constructor saves the Uniswap contract addresses and the two token addresses.
     // The deployer is set as the owner (Ownable).
     constructor(
@@ -107,7 +107,7 @@ contract RewardTokensManager is Ownable {
         }
     }
 
-    // ---------------------------- Public view functions ----------------------------
+    // ---------------------------- PUBLIC VIEW FUNCTIONS ----------------------------
     // Returns the two tokens in the sorted order that Uniswap expects.
     function getCanonicalCurrencies() external view returns (Currency, Currency) {
         return (currency0, currency1);
@@ -140,7 +140,7 @@ contract RewardTokensManager is Ownable {
         return poolId;
     }
 
-    // ---------------------------- Pool creation ----------------------------
+    // ---------------------------- POOL CREATION ----------------------------
     // Creates a Uniswap v4 pool for the two reward tokens.
     // The caller provides the starting price as sqrtPriceX96.
     // onlyOwner restricts this action to the contract deployer so the pool cannot be re‑created or altered by anyone else.
@@ -167,7 +167,7 @@ contract RewardTokensManager is Ownable {
         emit PoolCreated(_poolId, currency0, currency1, FEE_TIER, TICK_SPACING, HOOKS, sqrtPriceX96);
     }
 
-    // ---------------------------- Liquidity minting ----------------------------
+    // ---------------------------- LIQUIDITY MINTING ----------------------------
     // Mints a concentrated liquidity position in the pool.
     // The caller specifies:
     //   - tickLower and tickUpper: the price range where liquidity will be active
